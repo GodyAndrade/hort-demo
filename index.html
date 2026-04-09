@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HORT Seguros — Fluxo Único Inteligente</title>
+<style>
+  :root {
+    --bg: #0b141a;
+    --panel: #111b21;
+    --panel-2: #202c33;
+    --text: #e9edef;
+    --muted: #8696a0;
+    --bot: #202c33;
+    --user: #005c4b;
+    --accent: #1fa971;
+    --line: #2a3942;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, Arial, sans-serif;
+    background: linear-gradient(180deg, #0b141a 0%, #111b21 100%);
+    color: var(--text);
+  }
+  .wrap {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
+  }
+  .hero {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 24px;
+    align-items: start;
+    margin-bottom: 24px;
+  }
+  .card {
+    background: rgba(17, 27, 33, 0.95);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+  }
+  .intro {
+    padding: 28px;
+  }
+  .eyebrow {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  h1 {
+    margin: 0 0 12px;
+    font-size: 40px;
+    line-height: 1.05;
+  }
+  .sub {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #c8d1d6;
+    margin-bottom: 18px;
+  }
+  .bullets {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .bullet {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #d8e1e6;
+  }
+  .summary {
+    padding: 24px;
+  }
+  .summary h3, .section h3 {
+    margin: 0 0 14px;
+    font-size: 20px;
+  }
+  .pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .pill {
+    padding: 10px 12px;
+    border-radius: 999px;
+    background: rgba(31,169,113,0.12);
+    color: #c8f4df;
+    border: 1px solid rgba(31,169,113,0.35);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 430px 1fr;
+    gap: 24px;
+  }
+  .phone {
+    overflow: hidden;
+  }
+  .phone-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    background: #202c33;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1fa971, #0f6b47);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+  }
+  .phone-body {
+    background: radial-gradient(circle at top, rgba(255,255,255,0.04), transparent 40%), #0b141a;
+    min-height: 720px;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat {
+    flex: 1;
+    padding: 18px;
+    overflow: hidden;
+  }
+  .date-divider {
+    margin: 6px auto 18px;
+    width: fit-content;
+    background: rgba(17,27,33,0.85);
+    color: var(--muted);
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+  .msg {
+    max-width: 88%;
+    padding: 10px 12px 8px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    line-height: 1.45;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: 0.25s ease;
+    white-space: normal;
+  }
+  .msg.visible { opacity: 1; transform: translateY(0); }
+  .msg-bot { background: var(--bot); border-top-left-radius: 4px; }
+  .msg-user { background: var(--user); margin-left: auto; border-top-right-radius: 4px; }
+  .sender-name { color: #7dd3a9; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+  .msg-time { margin-top: 6px; font-size: 11px; color: #9db3bd; text-align: right; }
+  .check { color: #53bdeb; }
+  .typing {
+    display: none;
+    margin: 0 18px 16px;
+    background: var(--bot);
+    width: fit-content;
+    padding: 10px 14px;
+    border-radius: 12px;
+  }
+  .typing.active { display: inline-flex; gap: 6px; }
+  .typing span {
+    width: 7px; height: 7px; border-radius: 50%; background: #9db3bd; animation: blink 1.1s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.15s; }
+  .typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: .25; transform: translateY(0);} 40% { opacity: 1; transform: translateY(-3px);} }
+  .quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: -2px 0 14px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: .2s ease;
+  }
+  .quick-replies.visible { opacity: 1; transform: translateY(0); }
+  .qr-btn {
+    background: transparent;
+    color: #79d7aa;
+    border: 1px solid rgba(121,215,170,0.35);
+    padding: 9px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .qr-btn.selected, .qr-btn:disabled { opacity: .55; }
+  .panel-stack {
+    display: grid;
+    gap: 18px;
+  }
+  .section {
+    padding: 22px;
+  }
+  .section p, .section li {
+    color: #d2dbe0;
+    line-height: 1.6;
+  }
+  .section ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .mini {
+    padding: 16px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .mini h4 {
+    margin: 0 0 10px;
+    font-size: 16px;
+  }
+  .flow-box {
+    padding: 16px;
+    border-left: 3px solid var(--accent);
+    background: rgba(31,169,113,0.06);
+    border-radius: 12px;
+    margin-top: 10px;
+  }
+  @media (max-width: 1024px) {
+    .hero, .layout, .grid-2 { grid-template-columns: 1fr; }
+    h1 { font-size: 32px; }
+    .phone-body { min-height: 640px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="card intro">
+      <div class="eyebrow">Demo de atendimento inteligente</div>
+      <h1>HORT Seguros, fluxo único, natural e orientado à ação</h1>
+      <div class="sub">
+        Em vez de menus engessados, a IA entende o motivo do contato logo na entrada, conduz a conversa de forma humana e direciona cada caso para a trilha certa, seja comercial, renovação, suporte ou sinistro em plantão.
+      </div>
+      <div class="bullets">
+        <div class="bullet"><strong>Um único ponto de entrada.</strong> O cliente escreve do jeito dele e a IA entende a intenção.</div>
+        <div class="bullet"><strong>Urgência tratada diferente.</strong> Sinistro não entra no mesmo fluxo de cotação.</div>
+        <div class="bullet"><strong>Triagem curta e útil.</strong> A IA coleta só o necessário e já entrega contexto limpo para o corretor.</div>
+      </div>
+    </div>
+    <div class="card summary">
+      <h3>Serviços identificados na HORT</h3>
+      <div class="pill-grid">
+        <div class="pill">Seguro de Vida</div>
+        <div class="pill">Seguro Empresarial</div>
+        <div class="pill">Seguro Viagem</div>
+        <div class="pill">Seguro Residencial</div>
+        <div class="pill">RC Profissional</div>
+        <div class="pill">Equipamentos e Máquinas</div>
+      </div>
+      <div class="flow-box">
+        <strong>Leitura estratégica</strong><br>
+        A HORT opera com mistura de varejo PF, atendimento PJ consultivo e suporte real de sinistro. O fluxo ideal precisa reconhecer essas diferenças sem jogar o cliente em um questionário seco.
+      </div>
+    </div>
+  </div>
+
+  <div class="card section" style="margin-bottom:24px;">
+    <h3>Job to be done</h3>
+    <p>
+      Quando um cliente entra pelo Instagram ou WhatsApp da HORT, a IA precisa entender rapidamente o motivo do contato, conduzir a conversa de forma natural e levar cada caso para o especialista certo, sem travar urgências, sem perder oportunidades comerciais e sem parecer um robô.
+    </p>
+    <div class="grid-2">
+      <div class="mini">
+        <h4>O problema hoje</h4>
+        <ul>
+          <li>sinistro, cotação e suporte podem chegar no mesmo canal</li>
+          <li>nem todo contato quer seguir menu ou formulário</li>
+          <li>urgência precisa de resposta diferente de venda</li>
+          <li>lead mal filtrado faz o corretor perder tempo e contexto</li>
+        </ul>
+      </div>
+      <div class="mini">
+        <h4>A proposta de valor</h4>
+        <ul>
+          <li>resposta rápida sem cara de automação burra</li>
+          <li>triagem natural por intenção</li>
+          <li>priorização imediata de sinistro e plantão</li>
+          <li>handoff com contexto limpo para o especialista certo</li>
+        </ul>
+      </div>
+    </div>
+    <div class="flow-box">
+      <strong>Resumo em uma frase</strong><br>
+      Um único atendimento inteligente que entende a intenção do cliente, conduz a conversa naturalmente e acelera tanto o comercial quanto o plantão da HORT.
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="card phone">
+      <div class="phone-top">
+        <div class="avatar">H</div>
+        <div>
+          <div style="font-weight:700;">HORT Seguros</div>
+          <div style="color:#9db3bd;font-size:13px;">atendimento inteligente · Instagram / WhatsApp</div>
+        </div>
+      </div>
+      <div class="phone-body">
+        <div class="chat" id="chat">
+          <div class="date-divider">hoje</div>
+        </div>
+        <div class="typing" id="typing"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="panel-stack">
+      <div class="card section">
+        <h3>Como o fluxo funciona</h3>
+        <div class="grid-2">
+          <div class="mini">
+            <h4>Camada 1, entender a intenção</h4>
+            <ul>
+              <li>cotação nova</li>
+              <li>renovação</li>
+              <li>sinistro / urgência</li>
+              <li>suporte de apólice</li>
+              <li>produto consultivo</li>
+              <li>falar com humano</li>
+            </ul>
+          </div>
+          <div class="mini">
+            <h4>Camada 2, filtrar sem parecer formulário</h4>
+            <ul>
+              <li>perguntas curtas e contextuais</li>
+              <li>tom compatível com a situação</li>
+              <li>menos coleta, mais direção</li>
+              <li>handoff com contexto pronto</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h3>Trilhas internas invisíveis para o cliente</h3>
+        <div class="grid-2">
+          <div class="mini">
+            <h4>Comercial</h4>
+            <ul>
+              <li>auto, residencial, vida, viagem</li>
+              <li>empresarial</li>
+              <li>RC profissional</li>
+              <li>equipamentos e máquinas</li>
+            </ul>
+          </div>
+          <div class="mini">
+            <h4>Atendimento e urgência</h4>
+            <ul>
+              <li>sinistro com ou sem terceiros</li>
+              <li>guincho e assistência</li>
+              <li>localização</li>
+              <li>direcionamento imediato para o plantão</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h3>Princípios do atendimento HORT</h3>
+        <ul>
+          <li><strong>Natural por fora, roteado por dentro.</strong> O cliente não precisa clicar em árvore de menu para ser entendido.</li>
+          <li><strong>Sinistro é prioridade.</strong> Se houver urgência, a IA interrompe a lógica comercial e entra em modo de apoio rápido.</li>
+          <li><strong>Direto e humano.</strong> Menos cara de bot, mais cara de atendimento que resolve.</li>
+          <li><strong>Transferência com contexto.</strong> O especialista recebe resumo, urgência e dados já coletados.</li>
+        </ul>
+        <div class="flow-box">
+          <strong>Exemplo de handoff ideal:</strong><br>
+          “Perfeito, já entendi seu caso e vou deixar seu atendimento com o especialista certo. Já estou encaminhando com todas as informações para agilizar seu retorno.”
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const chat = document.getElementById('chat');
+  const typing = document.getElementById('typing');
+  const t = '09:47';
+
+  const flow = [
+    { type: 'user', text: 'Bom dia, bati o carro agora e preciso de ajuda', delay: 500 },
+    { type: 'bot', text: 'Olá, estou com você por aqui. Primeiro, me confirma uma coisa: está tudo bem com você e com os envolvidos?', delay: 1200,
+      quickReplies: ['Sim, todos bem', 'Tem feridos', 'Ainda estou verificando'] },
+    { type: 'user', text: 'Sim, todos bem', delay: 700 },
+    { type: 'bot', text: 'Certo. Você precisa que eu acione guincho ou a assistência agora?', delay: 1200,
+      quickReplies: ['Sim, preciso', 'Não precisa', 'Acho que sim'] },
+    { type: 'user', text: 'Sim, preciso', delay: 700 },
+    { type: 'bot', text: 'Perfeito. Me envia sua localização atual e, se puder, a placa do veículo ou o nome do segurado para eu agilizar o atendimento.', delay: 1500 },
+    { type: 'user', text: 'Estou na João Peters, em Brusque. Placa ABC1D23', delay: 900 },
+    { type: 'bot', text: 'Perfeito, já organizei as informações principais do seu caso. Vou direcionar agora para o plantão com prioridade para seguir com o acionamento e te atualizar na sequência.', delay: 1800 },
+    { type: 'user', text: 'Fechado, obrigado', delay: 900 },
+    { type: 'bot', text: 'Seguimos por aqui com você. Se houver qualquer mudança no local ou necessidade imediata, me avise nesta conversa.', delay: 1200 },
+
+    { type: 'user', text: 'Outra dúvida, vocês fazem seguro empresarial também?', delay: 1800 },
+    { type: 'bot', text: 'Fazemos sim. Atendemos desde proteção patrimonial até demandas mais específicas da operação. Se quiser, eu já entendo rapidamente o perfil da sua empresa e te encaminho para o consultor ideal.', delay: 1500,
+      quickReplies: ['Quero sim', 'Só estou pesquisando', 'Prefiro falar direto com especialista'] },
+    { type: 'user', text: 'Quero sim', delay: 700 },
+    { type: 'bot', text: 'Perfeito. Me diz só o ramo da empresa e a cidade onde ela atua, para eu te direcionar da forma mais assertiva.', delay: 1400 },
+    { type: 'user', text: 'Comércio em Brusque', delay: 700 },
+    { type: 'bot', text: 'Fechado. Já deixei seu atendimento separado como seguro empresarial, com o contexto do que você precisa. Agora sigo com o especialista certo para continuar com você de forma consultiva.', delay: 1700 },
+    { type: 'bot', text: '_Fluxo único HORT: a IA entende a intenção, filtra naturalmente e direciona sem parecer um menu engessado._', delay: 1200 }
+  ];
+
+  function addMsg(type, text, qr) {
+    const msg = document.createElement('div');
+    msg.className = `msg msg-${type}`;
+    let content = '';
+    if (type === 'bot') content += `<div class="sender-name">HORT Seguros</div>`;
+    let formatted = text
+      .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
+      .replace(/_(.*?)_/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+    content += formatted;
+    content += `<div class="msg-time">${t}${type === 'user' ? ' <span class="check">✓✓</span>' : ''}</div>`;
+    msg.innerHTML = content;
+    chat.appendChild(msg);
+
+    if (qr && qr.length) {
+      const qrWrap = document.createElement('div');
+      qrWrap.className = 'quick-replies';
+      qr.forEach(label => {
+        const btn = document.createElement('button');
+        btn.className = 'qr-btn';
+        btn.textContent = label;
+        btn.onclick = () => {
+          qrWrap.querySelectorAll('.qr-btn').forEach(b => b.disabled = true);
+          btn.classList.add('selected');
+        };
+        qrWrap.appendChild(btn);
+      });
+      chat.appendChild(qrWrap);
+      setTimeout(() => qrWrap.classList.add('visible'), 100);
+    }
+
+    setTimeout(() => msg.classList.add('visible'), 50);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function showTyping() {
+    typing.classList.add('active');
+    chat.scrollTop = chat.scrollHeight;
+  }
+  function hideTyping() { typing.classList.remove('active'); }
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function runStep(i) {
+    if (i >= flow.length) return;
+    const s = flow[i];
+    await sleep(s.delay);
+    if (s.type === 'bot') {
+      showTyping();
+      await sleep(700 + s.text.length * 12);
+      hideTyping();
+    }
+    addMsg(s.type, s.text, s.quickReplies);
+    await sleep(250);
+    runStep(i + 1);
+  }
+
+  runStep(0);
+</script>
+</body>
+</html>
